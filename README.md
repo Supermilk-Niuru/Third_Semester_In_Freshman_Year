@@ -1,4 +1,4 @@
-### 图书管理系统
+### Summer_Semester
 ###### 本图书管理系统主要结构（version 1.00）
 ```
 Project/

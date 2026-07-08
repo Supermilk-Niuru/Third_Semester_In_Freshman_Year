@@ -17,6 +17,7 @@ private:
     long entryTime;      // 入场时间（用秒数表示，从1970年开始的秒数）
     string side;         // 停在哪边："东边" 或 "西边"
     bool paid;           // 是否已缴费：true=已缴，false=未缴
+    bool needCharging;   // 是否需要充电桩（绿牌车专用）：true=需要，false=不需要
 
 public:
     // ---- 构造函数 ----
@@ -25,15 +26,18 @@ public:
     Car() {
         entryTime = 0;    // 入场时间设为0
         paid = false;     // 默认未缴费
+        needCharging = false;  // 默认不需要充电桩
     }
 
-    // 有参数的构造函数（创建车对象时传入车牌号、颜色、位置）
-    Car(string no, string color, string s) {
+    // 有参数的构造函数（创建车对象时传入车牌号、颜色、位置、是否需要充电桩）
+    // needCharge 参数有默认值 false，不传就默认为不需要
+    Car(string no, string color, string s, bool needCharge = false) {
         plateNo = no;           // 设置车牌号
         plateColor = color;     // 设置车牌颜色
         side = s;               // 设置停车位置
         entryTime = time(0);    // 设置入场时间为当前系统时间（time(0)返回当前秒数）
         paid = false;           // 刚入场，未缴费
+        needCharging = needCharge;  // 设置是否需要充电桩
     }
 
     // ---- 获取私有成员的值（Getter） ----
@@ -43,10 +47,12 @@ public:
     long getEntryTime() { return entryTime; }      // 获取入场时间（秒数）
     string getSide() { return side; }              // 获取停车位置
     bool isPaid() { return paid; }                 // 获取缴费状态
+    bool getNeedCharging() { return needCharging; } // 获取是否需要充电桩
 
     // ---- 设置私有成员的值（Setter） ----
 
     void setPaid(bool p) { paid = p; }             // 设置缴费状态
+    void setNeedCharging(bool n) { needCharging = n; } // 设置是否需要充电桩
 
     // ---- 工具方法 ----
 
@@ -67,10 +73,42 @@ public:
     }
 
     // 计算停车费用
-    // 收费标准：3元/小时，不足1小时按分钟算（每分钟 3/60 = 0.05 元）
+    // 新规则：
+    //   - 停车不满15分钟 → 免费
+    //   - 绿牌车（新能源）→ 打九折
+    //   - 其他正常计费：3元/小时，不足1小时按分钟算（每分钟 3/60 = 0.05 元）
     double getFee() {
         double mins = getMinutes();    // 先获取停车分钟数
-        return mins * (3.0 / 60.0);    // 分钟数 × 每分钟价格
+
+        // 规则1：停车不满15分钟，免费
+        if (mins < 15) {
+            return 0.0;
+        }
+
+        // 正常计费：分钟数 × 每分钟价格
+        double fee = mins * (3.0 / 60.0);
+
+        // 规则2：绿牌车（新能源电动车）停车费打九折
+        if (plateColor == "绿色") {
+            fee = fee * 0.9;           // 乘以0.9就是打九折
+        }
+
+        return fee;                    // 返回最终费用
+    }
+
+    // 获取绿牌车折扣的说明文字（用在出场界面显示）
+    string getDiscountInfo() {
+        double mins = getMinutes();    // 获取停车分钟数
+
+        if (mins < 15) {
+            return "（停车不满15分钟，免费）";  // 不满15分钟免费
+        }
+
+        if (plateColor == "绿色") {
+            return "（绿牌新能源车，享受九折优惠）";  // 绿牌打折说明
+        }
+
+        return "";  // 普通车辆没有额外说明
     }
 };
 

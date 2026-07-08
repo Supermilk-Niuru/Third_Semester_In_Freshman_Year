@@ -18,3 +18,31 @@ Project/
 ├── staff.txt           # 工作人员数据（运行后自动生成）
 └── README.md           # 本文档
 ```
+###### 本停车场管理系统主要结构（version 1.00）
+```
+main()
+ ├── showHeader()          ← 每次循环都先刷新界面
+ ├── showMenu()            ← 显示菜单选项
+ │
+ ├── [选1] carEntry()      ← 车辆入场
+ │    ├── lot.findCar()         检查是否重复
+ │    ├── lot.getEastFree()     检查东边车位
+ │    ├── lot.getWestFree()     检查西边车位
+ │    ├── Car(no, color, side)  创建车辆对象
+ │    └── lot.enterCar(car)     执行入场
+ │
+ ├── [选2] carExit()       ← 车辆出场
+ │    ├── lot.findCar()         查找车辆
+ │    ├── lot.getCar(index)     获取车辆信息
+ │    ├── car.getFee()          计算费用
+ │    ├── lot.exitCar(plateNo)  执行出场
+ │    └── exited.setPaid(true)  标记已缴费
+ │
+ ├── [选3] showParked()    ← 查看在场车辆
+ │    └── lot.showParkedCars()
+ │
+ ├── [选4] showHistory()   ← 查看历史记录
+ │    └── lot.showHistory()
+ │
+ └── [选5] return 0        ← 退出程序
+```

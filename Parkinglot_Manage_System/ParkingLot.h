@@ -230,7 +230,7 @@ public:
     // ---- 显示所有在场车辆信息 ----
     void showParkedCars() {
         cout << "当前在场车辆：" << endl;
-        cout << "----------------------------------------" << endl;
+        cout << "------------------------------------------------------------" << endl;
         if (carCount == 0) {
             cout << "  暂无车辆" << endl;
         } else {
@@ -238,19 +238,20 @@ public:
             for (int i = 0; i < carCount; i++) {
                 cout << "  " << (i + 1) << ". "
                      << "车牌：" << parkedCars[i].getPlateNo()
-                     << "  颜色：" << parkedCars[i].getPlateColor();
+                     << "  颜色：" << parkedCars[i].getPlateColor()
+                     << "  类型：" << parkedCars[i].getCarType();
 
                 // 如果这辆绿牌车用了充电桩，加标记
                 if (parkedCars[i].getNeedCharging()) {
-                    cout << "  ⚡充电";
+                    cout << " ⚡";
                 }
 
-                cout << "  位置：" << parkedCars[i].getSide()
+                cout << "  " << parkedCars[i].getSide()
                      << "  入场：" << parkedCars[i].getTimeStr()
                      << endl;
             }
         }
-        cout << "----------------------------------------" << endl;
+        cout << "------------------------------------------------------------" << endl;
     }
 
     // ---- 显示历史记录 ----

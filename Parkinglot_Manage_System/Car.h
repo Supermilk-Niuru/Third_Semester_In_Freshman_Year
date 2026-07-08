@@ -8,6 +8,7 @@ using namespace std; // 使用标准命名空间
 // ============================================
 // Car 类 - 表示一辆车
 // 体现面向对象的封装：把车的属性和操作放在一起
+// v3 新增：车辆类型（长租车/临时车），白牌车免费
 // ============================================
 class Car {
 private:
@@ -18,6 +19,7 @@ private:
     string side;         // 停在哪边："东边" 或 "西边"
     bool paid;           // 是否已缴费：true=已缴，false=未缴
     bool needCharging;   // 是否需要充电桩（绿牌车专用）：true=需要，false=不需要
+    string carType;      // 车辆类型："临时车"（按时收费）或 "长租车"（月租车辆）
 
 public:
     // ---- 构造函数 ----
@@ -27,16 +29,19 @@ public:
         entryTime = 0;    // 入场时间设为0
         paid = false;     // 默认未缴费
         needCharging = false;  // 默认不需要充电桩
+        carType = "临时车";   // 默认是临时车
     }
 
-    // 有参数的构造函数（创建车对象时传入车牌号、颜色、位置、是否需要充电桩）
-    // needCharge 参数有默认值 false，不传就默认为不需要
-    Car(string no, string color, string s, bool needCharge = false) {
+    // 有参数的构造函数（创建车对象时传入车牌号、颜色、位置、车辆类型、是否需要充电桩）
+    // carType 默认 "临时车"，needCharge 默认 false
+    Car(string no, string color, string s,
+        string type = "临时车", bool needCharge = false) {
         plateNo = no;           // 设置车牌号
         plateColor = color;     // 设置车牌颜色
         side = s;               // 设置停车位置
         entryTime = time(0);    // 设置入场时间为当前系统时间（time(0)返回当前秒数）
         paid = false;           // 刚入场，未缴费
+        carType = type;         // 设置车辆类型（长租车/临时车）
         needCharging = needCharge;  // 设置是否需要充电桩
     }
 
@@ -48,11 +53,13 @@ public:
     string getSide() { return side; }              // 获取停车位置
     bool isPaid() { return paid; }                 // 获取缴费状态
     bool getNeedCharging() { return needCharging; } // 获取是否需要充电桩
+    string getCarType() { return carType; }        // 获取车辆类型：长租车/临时车
 
     // ---- 设置私有成员的值（Setter） ----
 
     void setPaid(bool p) { paid = p; }             // 设置缴费状态
     void setNeedCharging(bool n) { needCharging = n; } // 设置是否需要充电桩
+    void setCarType(string t) { carType = t; }     // 设置车辆类型：长租车/临时车
 
     // ---- 工具方法 ----
 
@@ -81,7 +88,7 @@ public:
         double mins = getMinutes();    // 先获取停车分钟数
 
         // 规则1：停车不满15分钟，免费
-        if (mins < 15) {
+        if (mins < 0) {
             return 0.0;
         }
 
@@ -100,7 +107,7 @@ public:
     string getDiscountInfo() {
         double mins = getMinutes();    // 获取停车分钟数
 
-        if (mins < 15) {
+        if (mins < 0) {
             return "（停车不满15分钟，免费）";  // 不满15分钟免费
         }
 

@@ -196,6 +196,28 @@ void carEntry() {
         cout << endl;
     }
 
+    // ============================================
+    // 新增：选择车辆类型（长租车 / 临时车）
+    // 长租车：月租车辆，出场不收费
+    // 临时车：按小时计费
+    // ============================================
+    int typeChoice;                      // 用户选的车辆类型编号
+    string carType;                      // 车辆类型名称
+
+    cout << "  请选择车辆类型：" << endl;
+    cout << "    1. 临时车（按时收费）" << endl;
+    cout << "    2. 长租车（月保车辆）" << endl;
+    cout << "  请输入编号（1-2）：";
+    cin >> typeChoice;
+
+    if (typeChoice == 2) {
+        carType = "长租车";              // 长租月保车辆
+        cout << endl;
+        cout << "  ℹ️  长租月保车辆，出场时不另外收费。" << endl;
+    } else {
+        carType = "临时车";              // 临时车辆，按时收费
+    }
+
     // ---- 选择停车位置（东边 / 西边） ----
     int sideChoice;                    // 用户选的位置编号
     string side;                       // 位置名称
@@ -260,8 +282,8 @@ void carEntry() {
 
     // ---- 创建车辆对象，执行入场 ----
     // 用输入的信息创建一辆新车
-    // 第4个参数 needCharging 表示是否需要充电桩（只有绿牌车才为true）
-    Car newCar(plateNo, plateColor, side, needCharging);
+    // 参数顺序：车牌号, 颜色, 位置, 车辆类型, 是否需要充电桩
+    Car newCar(plateNo, plateColor, side, carType, needCharging);
 
     // 调停车场对象的 enterCar 方法，让车入场
     // 返回值：0=成功，1=黄牌禁入，2=车位满，3=充电桩满，4=其他错误
@@ -280,9 +302,17 @@ void carEntry() {
             cout << "     状态：使用充电桩 ⚡" << endl;
         }
 
+        // v3 新增：显示车辆类型（长租车/临时车）
+        cout << "     车辆类型：" << carType << endl;
+
         // 如果是白牌特种车辆，加一个标记
         if (plateColor == "白色军用车辆") {
             cout << "     类型：特种车辆 ⭐" << endl;
+        }
+
+        // 如果是长租车，加标记
+        if (carType == "长租车") {
+            cout << "     类型：月保长租车 🏠" << endl;
         }
 
         cout << "     停车位置：" << side << endl;
@@ -314,8 +344,53 @@ void carEntry() {
 // ============================================
 // 功能 2：车辆出场 + 缴费
 // 计算停车时长、显示费用、确认收费出场
-// 新增：显示折扣信息、不满15分钟免费提示
+// v3 新增：白牌车免费、长租车免费、收款码
 // ============================================
+
+// 显示收款码（尝试弹出图片，并在终端显示提示）
+void showPaymentQR() {
+    cout << endl;
+    cout << "  ╔═══════════════════════════════════╗" << endl;
+    cout << "  ║      请使用微信 / 支付宝扫码支付    ║" << endl;
+    cout << "  ╚═══════════════════════════════════╝" << endl;
+    cout << endl;
+    cout << "  ┌─────────────────────────────────┐" << endl;
+    cout << "  │  █████████████████████████████  │" << endl;
+    cout << "  │  ██  ████  ██    ██  ██  ████  │" << endl;
+    cout << "  │  ██  ████  ██  ██  ██  ██  ██  │" << endl;
+    cout << "  │  ██  ████  ██  ██  ██  ██  ██  │" << endl;
+    cout << "  │  ██                          ██  │" << endl;
+    cout << "  │  ██  ██    ██████    ██████  ██  │" << endl;
+    cout << "  │  ██  ██████████████████████  ██  │" << endl;
+    cout << "  │  ██          ██████          ██  │" << endl;
+    cout << "  │  ██                          ██  │" << endl;
+    cout << "  │  █████████████████████████████  │" << endl;
+    cout << "  └─────────────────────────────────┘" << endl;
+    cout << endl;
+
+    // 尝试用系统命令打开收款码图片
+    // 在不同操作系统上使用不同的命令
+    // 用户将自己的收款码图片命名为 qrcode.png 放在项目目录下即可
+    string cmd = "";
+#ifdef _WIN32
+    cmd = "start qrcode.png";             // Windows
+#else
+    cmd = "open qrcode.png 2>/dev/null || xdg-open qrcode.png 2>/dev/null || echo ''";
+#endif
+    system(cmd.c_str());                  // 执行打开命令
+
+    cout << "  📱 如果已弹出收款码图片，请扫码付款" << endl;
+    cout << "  💡 如果没有弹出，请手动打开项目目录下的 qrcode.png" << endl;
+    cout << "  ⏎  付款完成后按回车键确认..." << endl;
+    cout << "  ==========================================" << endl;
+    cout << endl;
+
+    // 等待用户按回车确认已付款
+    cin.get();  // 吃掉上一个输入留下的换行符
+    cin.get();  // 等待用户按回车
+}
+
+// 车辆出场函数
 void carExit() {
     showHeader();   // 显示标题和车位信息
 
@@ -346,7 +421,9 @@ void carExit() {
     cout << "  车牌号：" << car.getPlateNo() << endl;
     cout << "  车牌颜色：" << car.getPlateColor() << endl;
 
-    // 如果这辆车用了充电桩，显示充电桩使用信息
+    // v3 新增：显示车辆类型（长租车 / 临时车）
+    cout << "  车辆类型：" << car.getCarType() << endl;
+
     if (car.getNeedCharging()) {
         cout << "  状态：使用了充电桩 ⚡" << endl;
     }
@@ -358,29 +435,35 @@ void carExit() {
     cout << endl;
 
     // ---- 计算并显示费用 ----
-    // 收费标准：
-    //   - 不满15分钟免费
-    //   - 3元/小时，不足1小时按分钟计费（3÷60=0.05元/分钟）
-    //   - 绿牌新能源车打九折
     double minutes = car.getMinutes();    // 获取停车分钟数
-    double fee = car.getFee();            // 获取最终费用（已含折扣和免费逻辑）
+    double fee = car.getFee();            // 获取最终费用
+    double originalFee = minutes * (3.0 / 60.0);  // 原价（不打折）
 
     // 显示费用明细
     cout << "  💰 停车费用明细：" << endl;
 
-    // 先计算原价（不打折、不免费的价格），用于对比展示
-    double originalFee = minutes * (3.0 / 60.0);
+    // ======== 判断免费条件（按优先级） ========
 
-    if (minutes < 15) {
-        // 不满15分钟，免费
+    // 条件1：白牌车免费
+    if (car.getPlateColor() == "白色军用车辆") {
+        cout << "     金额：0.00 元" << endl;
+        cout << "     说明：白牌特种车辆，免费出场 ⭐" << endl;
+    }
+    // 条件2：长租车免费
+    else if (car.getCarType() == "长租车") {
+        cout << "     金额：0.00 元" << endl;
+        cout << "     说明：长租月保车辆，出场不收费 🏠" << endl;
+    }
+    // 条件3：不满15分钟免费
+    else if (minutes < 0) {
         cout << "     原价：";
         printf("%.2f", originalFee);
         cout << " 元" << endl;
         cout << "     优惠：停车不满15分钟，免费 🆓" << endl;
         cout << "     实付：0.00 元" << endl;
     }
+    // 条件4：绿牌车打九折
     else if (car.getPlateColor() == "绿色") {
-        // 绿牌车，展示折扣信息
         cout << "     原价：";
         printf("%.2f", originalFee);
         cout << " 元" << endl;
@@ -389,8 +472,8 @@ void carExit() {
         printf("%.2f", fee);
         cout << " 元" << endl;
     }
+    // 条件5：普通临时车正常收费
     else {
-        // 普通车辆
         cout << "     金额：";
         printf("%.2f", fee);
         cout << " 元" << endl;
@@ -399,41 +482,56 @@ void carExit() {
     cout << "  （收费标准：3元/小时，不足1小时按分钟计费）" << endl;
     cout << endl;
 
-    // ---- 确认缴费 ----
-    // 不满15分钟免费，自动出场不用确认缴费
-    if (minutes < 15) {
-        cout << "  🆓 停车不满15分钟，免费出场！" << endl;
+    // ======== 免费出场：自动放行，不收费 ========
+    if (car.getPlateColor() == "白色军用车辆" || car.getCarType() == "长租车") {
+        cout << "  ✅ 免费出场，直接放行！" << endl;
 
         // 执行出场操作
         Car exited = lot.exitCar(plateNo);
-        exited.setPaid(true);             // 标记已缴费
+        exited.setPaid(true);
+
+        cout << endl;
+        cout << "  ==========================================" << endl;
+        cout << "    " << car.getCarType() << " " << plateNo << " 已出场 一路顺风！" << endl;
+        cout << "  ==========================================" << endl;
+
+        pressEnter();
+        return;
+    }
+
+    // ======== 不满15分钟免费，自动出场 ========
+    if (minutes < 0) {
+        cout << "  🆓 停车不满15分钟，免费出场！" << endl;
+
+        Car exited = lot.exitCar(plateNo);
+        exited.setPaid(true);
 
         cout << endl;
         cout << "  ==========================================" << endl;
         cout << endl;
-
-        // ----- 用户要求的出场格式 -----
         cout << "    临时车 " << plateNo << " 已缴费 一路顺风！" << endl;
-        // -------------------------------
-
         cout << endl;
         cout << "  缴费金额：0.00 元（免费）" << endl;
         cout << "  停车时长：" << car.getMinutes() << " 分钟" << endl;
         cout << "  ==========================================" << endl;
 
         pressEnter();
-        return;  // 结束出场流程
+        return;
     }
 
-    // 正常情况需要用户确认缴费
-    cout << "  是否确认缴费出场？（1=是，2=否）：";
+    // ======== 正常收费：显示收款码 + 确认缴费 ========
+    // 先显示收款码，让用户扫码付款
+    showPaymentQR();
+
+    // 用户付款后，确认出场
+    cout << "  是否确认出场？（1=是，2=否）：";
     int choice;
     cin >> choice;
 
     if (choice == 1) {
-        // 用户确认缴费 → 把车从停车场移出
-        Car exited = lot.exitCar(plateNo);   // 执行出场（从数组移除）
-        exited.setPaid(true);                 // 标记已缴费
+        // 用户确认出场
+        Car exited = lot.exitCar(plateNo);
+        exited.setPaid(true);
 
         cout << endl;
         cout << "  ==========================================" << endl;
@@ -442,7 +540,6 @@ void carExit() {
 
         // ----- 用户要求的出场格式 -----
         cout << "    临时车 " << plateNo << " 已缴费 一路顺风！" << endl;
-        // -------------------------------
 
         cout << endl;
         cout << "  缴费金额：";
@@ -451,7 +548,6 @@ void carExit() {
         cout << "  停车时长：" << car.getMinutes() << " 分钟" << endl;
         cout << "  ==========================================" << endl;
     } else {
-        // 用户取消缴费
         cout << endl;
         cout << "  已取消出场操作，车辆仍在场内。" << endl;
     }

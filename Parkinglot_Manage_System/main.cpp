@@ -267,7 +267,7 @@ void carEntry() {
         if (side == "东边" && lot.getEastChargingFree() <= 0) {
             cout << endl;
             cout << "  【提示】东边充电桩已满！无法提供充电服务。" << endl;
-            cout << "  请选择西边，或不使用充电桩。" << endl;
+            cout << "  请选择西边，或不CCnuLin使用充电桩。" << endl;
             pressEnter();
             return;
         }

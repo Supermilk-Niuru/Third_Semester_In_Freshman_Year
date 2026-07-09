@@ -139,7 +139,7 @@ void carEntry() {
     cout << "  请输入编号（1-7）：";
     cin >> colorChoice;
 
-    // 用 if-else 把数字转成中文颜色名
+    // 用 if-else 把数字转成中文颜色
     if (colorChoice == 1) {
         plateColor = "蓝色";
     } else if (colorChoice == 2) {

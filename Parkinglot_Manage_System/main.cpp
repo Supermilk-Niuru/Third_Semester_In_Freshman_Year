@@ -1,27 +1,12 @@
-// ============================================
-// 停车场管理系统 - 主程序
-// 功能：车辆入场、车辆出场（收费）、查看在场车辆、
-//        查看历史记录、显示车位状态
-//
-// 迭代新增功能：
-//   - 黄牌车禁止入场（车身过大）
-//   - 白牌车（特种车辆）车位满了也让进
-//   - 绿牌车（新能源）停车费打九折
-//   - 东西两边各有25个充电桩
-//   - 绿牌车入场前选择是否需要充电桩
-//   - 停车不满15分钟免费
-// ============================================
-
-#include <iostream>   // 用于 cin（键盘输入）和 cout（屏幕输出）
-#include <cstdlib>    // 用于 system() 函数（清屏命令）
+#include <iostream>   
+#include <cstdlib>
 #ifdef _WIN32
     #include <windows.h>  // Windows系统：Sleep函数（暂停等待）
 #else
     #include <unistd.h>   // Linux/Mac系统：sleep函数（暂停等待）
 #endif
-
-#include "ParkingLot.h"  // 引入停车场类（管理车位、车辆的入场出场）
-#include "Car.h"         // 引入车辆类（存储车辆信息）
+#include "ParkingLot.h"  
+#include "Car.h"
 
 using namespace std;    // 使用标准命名空间，写 cout 不用写 std::cout
 

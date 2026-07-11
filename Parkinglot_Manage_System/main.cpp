@@ -16,9 +16,9 @@ ParkingLot lot(50, 50);
 //清屏函数
 void clearScreen() {
 #ifdef _WIN32
-    system("cls");   // Windows：用 cls 命令清屏
+    system("cls");   
 #else
-    system("clear"); // Mac / Linux：用 clear 命令清屏
+    system("clear"); 
 #endif
 }
 

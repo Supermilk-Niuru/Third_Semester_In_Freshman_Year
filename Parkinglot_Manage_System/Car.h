@@ -3,9 +3,7 @@
 #include <string>  
 #include <ctime>   
 using namespace std; 
-
 //车辆类：主要实现车辆信息存储的功能
-
 class Car {
 private:
     string plateNo;      // 车牌号

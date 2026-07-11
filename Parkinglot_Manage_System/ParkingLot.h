@@ -2,7 +2,7 @@
 #define PARKINGLOT_H
 #include <iostream>   
 #include "Car.h" 
-//主要实现停车场内部管理，车辆进场，出场缴费的功能
+//实现停车场内部管理，车辆进场，出场缴费的功能
 class ParkingLot {
 private:
     //车位信息
